@@ -1,0 +1,63 @@
+---
+version: "3.3"
+services:
+  bookstack:
+    image: lscr.io/linuxserver/bookstack
+    deploy:
+      mode: replicated
+      placement:  # use for deploy all the containers on manager node instead of worker nodes
+        constraints:
+          - node.role == manager
+      replicas: 1 # number of nodes
+    networks:
+     - elb
+    container_name: bookstack
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - APP_URL=https://kb.cloudgate.lk
+      - DB_HOST=DB_CREDENTIALS
+      - DB_USER=DB_CREDENTIALS
+      - DB_PASS=DB_CREDENTIALS
+      - DB_DATABASE=DB_CREDENTIALS
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.NEW_LABEL.entrypoints=web, websecure"
+      - "traefik.http.routers.NEW_LABEL.rule=Host(`kb.cloudgate.lk`)"
+      - "traefik.http.routers.NEW_LABEL.tls=true"
+      - "traefik.http.routers.NEW_LABEL.tls.certresolver=production"
+      - "traefik.http.routers.NEW_LABEL.service=NEW_SERVICE"
+      - "traefik.http.services.NEW_SERVICE.loadbalancer.server.port=80"
+    volumes:
+      - /opt/bookstack/config:/config
+    # ports:
+    #   - 80:80
+    restart: always
+  #   depends_on:
+  #     - bookstack_db
+  # bookstack_db:
+  #   image: lscr.io/linuxserver/mariadb
+  #   deploy:
+  #     mode: replicated
+  #     placement:  # use for deploy all the containers on manager node instead of worker nodes
+  #       constraints:
+  #         - node.role == manager
+  #     replicas: 1 # number of nodes
+  #   networks:
+  #    - elb 
+  #   container_name: bookstack_db
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - MYSQL_ROOT_PASSWORD=afJVGN!cxb1C
+  #     - TZ=Asia/Colombo
+  #     - MYSQL_DATABASE=bookstack
+  #     - MYSQL_USER=bookstack
+  #     - MYSQL_PASSWORD=afJVGN!cxb1C
+  #   volumes:
+  #     - /opt/bookstack/db_config:/config
+  #   restart: always
+networks:
+  elb:
+    external:
+      name: elb

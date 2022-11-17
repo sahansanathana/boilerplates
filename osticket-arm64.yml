@@ -1,0 +1,69 @@
+version: '3.7'
+services:
+
+  ost-demo:
+    image: tiredofit/osticket
+    deploy:
+      mode: replicated
+      placement:  # use for deploy all the containers on manager node instead of worker nodes
+        constraints:
+          - node.role == manager
+      replicas: 1 # number of nodes
+    networks:
+      - elb
+    container_name: ost-demo
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.NEW_LABEL.entrypoints=web, websecure"
+      - "traefik.http.routers.NEW_LABEL.rule=Host(`support.ceylonmicroservices.cloud`)"
+      - "traefik.http.routers.NEW_LABEL.tls=true"
+      - "traefik.http.routers.NEW_LABEL.tls.certresolver=production"
+      - "traefik.http.routers.NEW_LABEL.service=NEW_SERVICE"
+      - "traefik.http.services.NEW_SERVICE.loadbalancer.server.port=80"
+
+    healthcheck:
+      #test: ["CMD", "curl" ,"ping", "-h", "localhost"]
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      timeout: 10s
+      retries: 50
+
+    volumes:
+      - pv:/www/osticket
+      - pv:/www/logs
+
+    environment:
+      - CONTAINER_NAME=ost-demo
+
+      - CRON_PERIOD=10
+
+      - DB_HOST=DB_CREDENTIALS
+      - DB_NAME=DB_CREDENTIALS
+      - DB_USER=DB_CREDENTIALS
+      - DB_PASS=DB_CREDENTIALS
+
+      - SMTP_HOST=SMTP_CREDENTIALS
+      - SMTP_PORT=SMTP_CREDENTIALS
+      - SMTP_FROM=SMTP_CREDENTIALS
+      - SMTP_TLS=SMTP_CREDENTIALS
+      - SMTP_USER=SMTP_CREDENTIALS
+      - SMTP_PASS=SMTP_CREDENTIALS
+
+      - INSTALL_SECRET=supoerlongcharacterassecret
+      - INSTALL_EMAIL=info@ceylonmicroservices.cloud
+      - INSTALL_NAME=CloudGate Technologies
+
+      - ADMIN_FIRSTNAME=Sahan
+      - ADMIN_LASTNAME=Sanathana
+      - ADMIN_EMAIL=sahan@ceylonmicroservices.cloud
+      - ADMIN_USER=ostadmin # Keep this as it is
+      - ADMIN_PASS=PASSWORD
+    restart: always 
+
+volumes:
+    pv:
+        external: false
+
+networks:
+  elb:
+    external:
+      name: elb

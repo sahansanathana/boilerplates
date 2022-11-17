@@ -1,0 +1,22 @@
+version: '3'
+
+volumes:
+  nginxproxymanager-data:
+  nginxproxymanager-ssl:
+
+services:
+  nginxproxymanager:
+    image: 'jc21/nginx-proxy-manager:latest'
+    ports:
+      - '80:80'
+      - '81:81'
+      - '443:443'
+    environment:
+      DB_MYSQL_HOST: "DB_CREDENTIALS"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: "DB_CREDENTIALS"
+      DB_MYSQL_PASSWORD: "DB_CREDENTIALS"
+      DB_MYSQL_NAME: "DB_CREDENTIALS"
+    volumes:
+      - nginxproxymanager-data:/data
+      - nginxproxymanager-ssl:/etc/letsencrypt

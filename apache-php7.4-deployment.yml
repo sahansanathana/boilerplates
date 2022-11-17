@@ -1,0 +1,38 @@
+version: '3.3'
+services:   
+   xinjint-com:
+     image: php:7.4-apache
+     deploy:
+      mode: replicated
+      placement:  # use for deploy all the containers on manager node instead of worker nodes
+        constraints:
+          - node.role == manager
+      replicas: 1 # number of nodes
+     networks:
+      - elb
+     restart: always
+     
+     healthcheck:
+      #test: ["CMD", "curl" ,"ping", "-h", "localhost"]
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      timeout: 10s
+      retries: 50
+
+     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.xinjint.entrypoints=web, websecure"
+      - "traefik.http.routers.xinjint.rule=Host(`xinjint.com`)"
+      - "traefik.http.routers.xinjint.tls=true"
+      - "traefik.http.routers.xinjint.tls.certresolver=production"
+      - "traefik.http.routers.xinjint.service=xinjint-service"
+      - "traefik.http.services.xinjint-service.loadbalancer.server.port=80"
+
+     volumes:
+      - pv:/var/www/html # wordpress web root
+volumes:
+    pv:
+        external: false
+networks:
+  elb:
+    external:
+      name: elb

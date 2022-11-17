@@ -1,0 +1,37 @@
+version: '3.3'
+services:   
+   mysql:
+     image: mariadb:latest
+     hostname: prod-2.rds.cloudgate.lk
+     deploy:
+      mode: replicated
+      placement:  # use for deploy all the containers on manager node instead of worker nodes
+        constraints:
+          - node.role == manager
+      replicas: 1 # number of nodes
+     networks:
+      - elb
+     restart: always
+     environment:
+      - MYSQL_ROOT_PASSWORD=$3K7c#wuxWEM1sQd4BO
+
+     healthcheck:
+      #test: ["CMD", "curl" ,"ping", "-h", "localhost"]
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      timeout: 10s
+      retries: 50
+
+     labels:
+      - "traefik.enable=true"
+      - "traefik.tcp.routers.prod-2-rds.entrypoints=mysql"
+      - "traefik.tcp.routers.prod-2-rds.rule=HostSNI(`*`)"
+      - "traefik.tcp.services.prod-2-rds.loadbalancer.server.port=3306"
+     volumes:
+      - pv:/var/lib/mysql
+volumes:
+    pv:
+        external: false
+networks:
+  elb:
+    external:
+      name: elb

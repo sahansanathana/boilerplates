@@ -1,0 +1,44 @@
+version: '3.3'
+services:   
+   wordpress:
+     image: wordpress:latest
+     deploy:
+      mode: replicated
+      placement:  # use for deploy all the containers on manager node instead of worker nodes
+        constraints:
+          - node.role == manager
+      replicas: 10 # number of nodes
+     networks:
+      - elb
+     restart: always
+     environment:
+       WORDPRESS_DB_HOST: prod-1.rds.cloudgate.lk
+       WORDPRESS_DB_USER: DB_CREDENTIALS
+       WORDPRESS_DB_PASSWORD: DB_CREDENTIALS
+       WORDPRESS_DB_NAME: DB_CREDENTIALS
+       
+     labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.NEW_LABEL.entrypoints=web, websecure"
+      - "traefik.http.routers.NEW_LABEL.rule=Host(`DOMAIN_NAME`)"
+      - "traefik.http.routers.NEW_LABEL.tls=true"
+      - "traefik.http.routers.NEW_LABEL.tls.certresolver=production"
+      - "traefik.http.routers.NEW_LABEL.service=NEW_SERVICE_NAME"
+      - "traefik.http.services.NEW_SERVICE_NAME.loadbalancer.server.port=80"
+    
+     healthcheck:
+      #test: ["CMD", "curl" ,"ping", "-h", "localhost"]
+      test: ["CMD", "curl", "-f", "http://localhost"]
+      timeout: 10s
+      retries: 50
+      
+     volumes:
+      - pv:/var/www/html # wordpress web root
+      - /var/lib/docker/volumes/wordpress.ini/_data:/usr/local/etc/php # php configs ex: upload_max_size etc
+volumes:
+    pv:
+        external: false
+networks:
+  elb:
+    external:
+      name: elb

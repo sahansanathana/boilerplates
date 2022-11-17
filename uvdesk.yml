@@ -1,0 +1,32 @@
+version: '3.3'
+
+services:
+  app:
+    tty: true
+    image: duncanrmorris/uvdesk:latest-arm64
+    deploy:
+      mode: replicated
+      placement:  # use for deploy all the containers on manager node instead of worker nodes
+        constraints:
+          - node.role == manager
+      replicas: 1 # number of nodes
+    networks:
+      - elb
+    restart: always
+    volumes:
+      - "pv:/var/www:rw"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.NEW_LABEL.entrypoints=web, websecure"
+      - "traefik.http.routers.NEW_LABEL.rule=Host(`cgdesk.cloudgate.lk`)"
+      - "traefik.http.routers.NEW_LABEL.tls=true"
+      - "traefik.http.routers.NEW_LABEL.tls.certresolver=production"
+      - "traefik.http.routers.NEW_LABEL.service=NEW_SERVICE"
+      - "traefik.http.services.NEW_SERVICE.loadbalancer.server.port=80" 
+volumes:
+  pv:
+    driver: local
+networks:
+  elb:
+    external:
+      name: elb
