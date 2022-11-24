@@ -1,0 +1,92 @@
+version: '3.3'
+services:
+
+  nextcloud-app:
+    image: tiredofit/nextcloud:latest
+    deploy:
+      mode: replicated
+      placement:  # use for deploy all the containers on manager node instead of worker nodes
+        constraints:
+          - node.role == manager
+      replicas: 1 # number of nodes
+    networks:
+      - elb
+    container_name: nextcloud-app
+    ### These labels are for Traefik Reverse Proxies
+    # labels:
+    #   - traefik.enable=true
+    #   - traefik.http.routers.nextcloud.rule=Host(`drive.cloudgate.lk`)
+    #   - traefik.http.routers.nextcloud.entrypoints=web, websecure
+    #   - traefik.http.routers.nextcloud.tls=true
+    #   - traefik.http.routers.nextcloud.tls.certresolver=production
+    #   - traefik.http.services.nextcloud.loadbalancer.server.port=80
+    #   - traefik.http.middlewares.nextcloud.redirectregex.permanent=true
+    #   - traefik.http.middlewares.nextcloud.redirectregex.regex=https://(.*)/.well-known/(card|cal)dav
+    #   - traefik.http.middlewares.nextcloud.redirectregex.replacement=https://$$1/remote.php/dav/
+    #   - traefik.http.middlewares.nextcloud.redirectregex.permanent=true
+    #   - traefik.http.middlewares.nextcloud.headers.stsIncludeSubdomains=true
+    #   - traefik.http.middlewares.nextcloud.headers.stsSeconds=15552000
+    #   - traefik.http.routers.nextcloud.middlewares=nextcloud
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextcloud.entrypoints=web, websecure"
+      - "traefik.http.routers.nextcloud.rule=Host(`halfbloodtrees.org`)"
+      - "traefik.http.routers.nextcloud.tls=true"
+      - "traefik.http.routers.nextcloud.tls.certresolver=production"
+      - "traefik.http.routers.nextcloud.service=nextcloud_service"
+      - "traefik.http.services.nextcloud_service.loadbalancer.server.port=80"
+      - "traefik.http.middlewares.nextcloud.redirectregex.regex=https://(.*)/.well-known/(card|cal)dav"
+      - "traefik.http.middlewares.nextcloud.redirectregex.permanent=true"
+      - "traefik.http.middlewares.nextcloud.redirectregex.replacement=https://$$1/remote.php/dav/"
+      - "traefik.http.middlewares.nextcloud.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.nextcloud.headers.stsSeconds=15552000"
+    volumes:
+      - pv:/data/userdata
+      - pv/config:/www/nextcloud/config
+      - pv/apps:/data/apps
+      - pv/themes:/www/nextcloud/themes
+      - pv:/www/logs
+      - pv/templates:/data/templates
+    environment:
+      ### These 4 lines below are for jwilder/nginx-proxy and
+      - VIRTUAL_HOST=drive.cloudgate.lk
+      - VIRTUAL_NETWORK=proxy
+      - LETSENCRYPT_HOST=drive.cloudgate.lk
+      - LETSENCRYPT_EMAIL=info@cloudgate.lk
+      ###
+
+      - CRON_PERIOD=5
+
+      - ADMIN_USER=info@cloudgate.lk
+      - ADMIN_PASS=Root@kali1234
+      - DOMAIN=drive.cloudgate.lk
+
+      - DB_TYPE=mysql
+      - DB_NAME=nextcloud
+      - DB_USER=nextcloud
+      - DB_PASS=afJVGN!cxb1C
+      - DB_HOST=prod-2.rds.cloudgate.lk
+
+    ### These lines are for Fail2ban. If you don't want, comment and also add ENABLE_FAIL2BAN=FALSE to your environment
+    cap_add:
+      - NET_ADMIN
+    ###
+    restart: always
+
+  nextcloud-redis:
+    image: tiredofit/redis:latest
+    container_name: nextcloud-redis
+    volumes:
+     - pv:/data
+    networks:
+      - elb
+    restart: always
+
+volumes:
+    pv:
+        external: false
+     
+networks:
+  elb:
+    external:
+      name: elb

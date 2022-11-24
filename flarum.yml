@@ -1,0 +1,54 @@
+version: '3.7'
+services:
+  
+  flarum-app:
+    image: tiredofit/flarum
+    container_name: flarum-app
+    deploy:
+      mode: replicated
+      placement:  # use for deploy all the containers on manager node instead of worker nodes
+        constraints:
+          - node.role == manager
+      replicas: 1 # number of nodes
+    networks:
+      - elb
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.flarum.entrypoints=web, websecure"
+      - "traefik.http.routers.flarum.rule=Host(`forum.cloudgate.lk`)"
+      - "traefik.http.routers.flarum.tls=true"
+      - "traefik.http.routers.flarum.tls.certresolver=production"
+      - "traefik.http.routers.flarum.service=flarum_service"
+      - "traefik.http.services.flarum_service.loadbalancer.server.port=80"
+    # links:
+    #   - flarum-db
+    volumes:
+      - pv:/data
+      - pv:/www/logs
+    environment:
+      - CONTAINER_NAME=flarum-app
+
+      - ADMIN_USER=flarumadmin
+      - ADMIN_PASS=Root@kali1234
+      - ADMIN_EMAIL=info@cloudgate.lk
+
+      - SITE_TITLE=CloudGate Forum
+      - SITE_URL=https://forum.cloudgate.lk
+  
+      - DB_HOST=prod-2.rds.cloudgate.lk
+      - DB_NAME=flarum
+      - DB_USER=flarum
+      - DB_PASS=afJVGN!cxb1C
+
+      - DEBUG_MODE=FALSE
+    
+    restart: always
+
+volumes:
+    pv:
+        external: false
+     
+networks:
+  elb:
+    external:
+      name: elb

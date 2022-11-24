@@ -1,0 +1,59 @@
+version: '3.3'
+
+services:
+  
+  invoiceninja-app:
+    image: tiredofit/invoiceninja
+    deploy:
+      mode: replicated
+      placement:  # use for deploy all the containers on manager node instead of worker nodes
+        constraints:
+          - node.role == manager
+      replicas: 1 # number of nodes
+    networks:
+      - elb
+    restart: always
+    container_name: invoiceninja-app
+    # links:
+    #   - invoiceninja-db
+    volumes:
+      ### If you want to perform customizations to the source and have access to it, then uncomment this line - This includes modules
+      - pv:/www/html
+      ### Or, if you just want to use Stock invoiceninja and hold onto persistent files like cache and session use this, one or the other.
+      - pv:/data
+      ### If you want to just keep the original source and add additional modules uncomment this line
+      - pv:/www/logs
+    environment:
+      - CONTAINER_NAME=invoiceninja-app
+      - TIMEZONE=Asia/Colombo
+      
+      - DB_HOST=prod-2.rds.cloudgate.lk
+      - DB_NAME=invoiceninja
+      - DB_USER=invoiceninja
+      - DB_PASS=afJVGN!cxb1C
+
+      - SITE_URL=https://invoice.cloudgate.lk
+
+      - ADMIN_EMAIL=info@cloudgate.lk
+      - ADMIN_PASS=Root@kali124
+
+      - ENABLE_SSL_PROXY=TRUE
+      - DISPLAY_ERRORS=FALSE
+    
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.invoiceninja.entrypoints=web, websecure"
+      - "traefik.http.routers.invoiceninja.rule=Host(`invoice.cloudgate.lk`)"
+      - "traefik.http.routers.invoiceninja.tls=true"
+      - "traefik.http.routers.invoiceninja.tls.certresolver=production"
+      - "traefik.http.routers.invoiceninja.service=invoiceninja_service"
+      - "traefik.http.services.invoiceninja_service.loadbalancer.server.port=80"
+
+volumes:
+    pv:
+        external: false
+     
+networks:
+  elb:
+    external:
+      name: elb

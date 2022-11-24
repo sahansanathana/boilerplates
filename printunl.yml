@@ -1,0 +1,53 @@
+version: "3"
+
+services:
+  mongo:
+    image: mongo:latest
+    networks:
+      - elb
+    container_name: pritunldb
+    restart: always
+    hostname: pritunldb
+    volumes:
+      - pv:/data/db
+
+  pritunl:
+    image: goofball222/pritunl:latest
+    container_name: pritunl
+    restart: always
+    hostname: pritunl
+    depends_on:
+      - mongo
+    privileged: true
+    sysctls:
+      - net.ipv6.conf.all.disable_ipv6=0
+    links:
+      - mongo
+    volumes:
+      - pv:/etc/localtime:ro
+    ports:
+      - 10447:10447/udp
+    expose:
+      - 443
+    environment:
+      - TZ=America/Sao_Paulo
+      - MONGODB_URI=mongodb://mongo:27017/pritunl
+      - REVERSE_PROXY=true
+      - WIREGUARD=true
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pritunl.service=pritunl"
+      - "traefik.http.services.pritunl.loadbalancer.server.port=443"
+      - "traefik.http.services.pritunl.loadbalancer.server.scheme=https"
+      - "traefik.http.routers.pritunl.rule=Host(`portkey.cloudgate.lk`)"
+      - "traefik.http.routers.pritunl.tls.certresolver=production"
+      - "traefik.http.routers.pritunl.entrypoints=websecure"
+
+volumes:
+    pv:
+        external: false
+
+networks:
+  elb:
+    external:
+      name: elb
