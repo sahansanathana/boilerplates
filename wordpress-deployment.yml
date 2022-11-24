@@ -12,7 +12,7 @@ services:
       - elb
      restart: always
      environment:
-       WORDPRESS_DB_HOST: prod-1.rds.cloudgate.lk
+       WORDPRESS_DB_HOST: DB_CREDENTIALS
        WORDPRESS_DB_USER: DB_CREDENTIALS
        WORDPRESS_DB_PASSWORD: DB_CREDENTIALS
        WORDPRESS_DB_NAME: DB_CREDENTIALS

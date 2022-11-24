@@ -26,7 +26,7 @@ services:
      labels:
       - "traefik.enable=true"
       - "traefik.http.routers.NEW_LABEL.entrypoints=web, websecure"
-      - "traefik.http.routers.NEW_LABEL.rule=Host(`iyonlanka.com`)"
+      - "traefik.http.routers.NEW_LABEL.rule=Host(`DOMAIN`)"
       - "traefik.http.routers.NEW_LABEL.tls=true"
       - "traefik.http.routers.NEW_LABEL.tls.certresolver=production"
       - "traefik.http.routers.NEW_LABEL.service=NEW_LABEL-service"

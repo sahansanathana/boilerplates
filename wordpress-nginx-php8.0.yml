@@ -22,7 +22,7 @@ services:
      labels:
       - "traefik.enable=true"
       - "traefik.http.routers.NEW_LABEL.entrypoints=web, websecure"
-      - "traefik.http.routers.NEW_LABEL.rule=Host(`halfbloodtrees.org`)"
+      - "traefik.http.routers.NEW_LABEL.rule=Host(`DOMAIN_NAME`)"
       - "traefik.http.routers.NEW_LABEL.tls=true"
       - "traefik.http.routers.NEW_LABEL.tls.certresolver=production"
       - "traefik.http.routers.NEW_LABEL.service=NEW_SERVICE"

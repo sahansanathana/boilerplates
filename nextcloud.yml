@@ -30,7 +30,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.nextcloud.entrypoints=web, websecure"
-      - "traefik.http.routers.nextcloud.rule=Host(`halfbloodtrees.org`)"
+      - "traefik.http.routers.nextcloud.rule=Host(`DOMAIN`)"
       - "traefik.http.routers.nextcloud.tls=true"
       - "traefik.http.routers.nextcloud.tls.certresolver=production"
       - "traefik.http.routers.nextcloud.service=nextcloud_service"
@@ -52,20 +52,20 @@ services:
       - VIRTUAL_HOST=drive.cloudgate.lk
       - VIRTUAL_NETWORK=proxy
       - LETSENCRYPT_HOST=drive.cloudgate.lk
-      - LETSENCRYPT_EMAIL=info@cloudgate.lk
+      - LETSENCRYPT_EMAIL=LETSENCRYPT_EMAIL
       ###
 
       - CRON_PERIOD=5
 
-      - ADMIN_USER=info@cloudgate.lk
-      - ADMIN_PASS=Root@kali1234
+      - ADMIN_USER=USERNAME
+      - ADMIN_PASS=YOURPASS
       - DOMAIN=drive.cloudgate.lk
 
       - DB_TYPE=mysql
-      - DB_NAME=nextcloud
-      - DB_USER=nextcloud
-      - DB_PASS=afJVGN!cxb1C
-      - DB_HOST=prod-2.rds.cloudgate.lk
+      - DB_NAME=DB_CREDENTIALS
+      - DB_USER=DB_CREDENTIALS
+      - DB_PASS=DB_CREDENTIALS
+      - DB_HOST=DB_CREDENTIALS
 
     ### These lines are for Fail2ban. If you don't want, comment and also add ENABLE_FAIL2BAN=FALSE to your environment
     cap_add:

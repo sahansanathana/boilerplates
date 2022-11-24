@@ -12,15 +12,15 @@ services:
       - elb
      restart: always
      environment:
-       PMA_ARBITRARY: 1
+       PMA_ARBITRARY: 1 # use to access multiple Database Server from single PMA instnace
        UPLOAD_LIMIT: 1024M
        MEMORY_LIMIT: 1024M
-       MAX_EXECUTION_TIME: 0
+       MAX_EXECUTION_TIME: 0 # helpfull for large DB imports
   
      labels:
       - "traefik.enable=true"
       - "traefik.http.routers.NEW_LABEL.entrypoints=web, websecure"
-      - "traefik.http.routers.NEW_LABEL.rule=Host(`prod-2.rds.cloudgate.lk`)"
+      - "traefik.http.routers.NEW_LABEL.rule=Host(`DOMAIN`)"
       - "traefik.http.routers.NEW_LABEL.tls=true"
       - "traefik.http.routers.NEW_LABEL.tls.certresolver=production"
       - "traefik.http.routers.NEW_LABEL.service=NEW_SERVICE"

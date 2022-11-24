@@ -1,5 +1,4 @@
 version: '3.3'
-
 services:
   freescout-app:
     image: tiredofit/freescout
@@ -12,10 +11,6 @@ services:
       replicas: 1 # number of nodes
     networks:
       - elb
-    # ports:
-    # - 80:80
-    # links:
-    # - freescout-db
     volumes:
     ### If you want to perform customizations to the source and have access to it, then uncomment this line - This includes modules
     #- ./data:/www/html
@@ -27,14 +22,14 @@ services:
     environment:
     - CONTAINER_NAME=freescout-demo
     
-    - DB_HOST=prod-2.rds.cloudgate.lk
-    - DB_NAME=freescout_demo
-    - DB_USER=freescout_demo
-    - DB_PASS=afJVGN!cxb1C
+    - DB_HOST=DB_CREDENTIALS
+    - DB_NAME=DB_CREDENTIALS
+    - DB_USER=DB_CREDENTIALS
+    - DB_PASS=DB_CREDENTIALS
 
-    - SITE_URL=https://fc.ceylonmicroservices.cloud
-    - ADMIN_EMAIL=support@ceylonmicroservices.cloud
-    - ADMIN_PASS=freescout
+    - SITE_URL=SITE_URL
+    - ADMIN_EMAIL=ADMIN_EMAIL
+    - ADMIN_PASS=YOURPASS
     - ENABLE_SSL_PROXY=TRUE
     - DISPLAY_ERRORS=FALSE
     - TIMEZONE=Asia/Colombo
@@ -43,46 +38,12 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.freescout-demo.entrypoints=web, websecure"
-      - "traefik.http.routers.freescout-demo.rule=Host(`fc.ceylonmicroservices.cloud`)"
+      - "traefik.http.routers.freescout-demo.rule=Host(`DOMAIN`)"
       - "traefik.http.routers.freescout-demo.tls=true"
       - "traefik.http.routers.freescout-demo.tls.certresolver=production"
       - "traefik.http.routers.freescout-demo.service=freescout-demo_service"
       - "traefik.http.services.freescout-demo_service.loadbalancer.server.port=80"
 
-  # freescout-db:
-  #   image: tiredofit/mariadb
-  #   container_name: freescout-db
-  #   volumes:
-  #     - ./db:/var/lib/mysql
-  #   environment:
-  #     - ROOT_PASS=password
-  #     - DB_NAME=freescout
-  #     - DB_USER=freescout
-  #     - DB_PASS=freescout
-
-  #     - CONTAINER_NAME=freescout-db
-  #   restart: always
-
-  # freescout-db-backup:
-  #   container_name: freescout-db-backup
-  #   image: tiredofit/db-backup
-  #   links:
-  #    - freescout-db
-  #   volumes:
-  #     - ./dbbackup:/backup
-  #   environment:
-  #     - CONTAINER_NAME=freescout-db-backup
-  #     - DB_HOST=freescout-db
-  #     - DB_TYPE=mariadb
-  #     - DB_NAME=freescout
-  #     - DB_USER=freescout
-  #     - DB_PASS=freescout
-  #     - DB_DUMP_FREQ=1440
-  #     - DB_DUMP_BEGIN=0000
-  #     - DB_CLEANUP_TIME=8640
-  #     - COMPRESSION=BZ
-  #     - MD5=TRUE
-  #   restart: always
 volumes:
     pv:
         external: false

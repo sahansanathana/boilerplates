@@ -1,6 +1,5 @@
 version: '3.7'
 services:
-  
   flarum-app:
     image: tiredofit/flarum
     container_name: flarum-app
@@ -20,8 +19,7 @@ services:
       - "traefik.http.routers.flarum.tls.certresolver=production"
       - "traefik.http.routers.flarum.service=flarum_service"
       - "traefik.http.services.flarum_service.loadbalancer.server.port=80"
-    # links:
-    #   - flarum-db
+
     volumes:
       - pv:/data
       - pv:/www/logs

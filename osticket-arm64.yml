@@ -54,7 +54,7 @@ services:
 
       - ADMIN_FIRSTNAME=Sahan
       - ADMIN_LASTNAME=Sanathana
-      - ADMIN_EMAIL=sahan@ceylonmicroservices.cloud
+      - ADMIN_EMAIL=ADMIN_EMAIL
       - ADMIN_USER=ostadmin # Keep this as it is
       - ADMIN_PASS=PASSWORD
     restart: always 

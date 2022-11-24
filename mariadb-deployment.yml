@@ -13,7 +13,7 @@ services:
       - elb
      restart: always
      environment:
-      - MYSQL_ROOT_PASSWORD=$3K7c#wuxWEM1sQd4BO
+      - MYSQL_ROOT_PASSWORD=DB_CREDENTIALS
 
      healthcheck:
       #test: ["CMD", "curl" ,"ping", "-h", "localhost"]

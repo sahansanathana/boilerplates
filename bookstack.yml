@@ -33,30 +33,7 @@ services:
     # ports:
     #   - 80:80
     restart: always
-  #   depends_on:
-  #     - bookstack_db
-  # bookstack_db:
-  #   image: lscr.io/linuxserver/mariadb
-  #   deploy:
-  #     mode: replicated
-  #     placement:  # use for deploy all the containers on manager node instead of worker nodes
-  #       constraints:
-  #         - node.role == manager
-  #     replicas: 1 # number of nodes
-  #   networks:
-  #    - elb 
-  #   container_name: bookstack_db
-  #   environment:
-  #     - PUID=1000
-  #     - PGID=1000
-  #     - MYSQL_ROOT_PASSWORD=afJVGN!cxb1C
-  #     - TZ=Asia/Colombo
-  #     - MYSQL_DATABASE=bookstack
-  #     - MYSQL_USER=bookstack
-  #     - MYSQL_PASSWORD=afJVGN!cxb1C
-  #   volumes:
-  #     - /opt/bookstack/db_config:/config
-  #   restart: always
+    
 networks:
   elb:
     external:
